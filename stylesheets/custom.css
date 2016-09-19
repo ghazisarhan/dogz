@@ -1,0 +1,17 @@
+.icondiv {
+	background-image: url("/sgt-stubby/images/dogui.png");
+	width: 100%;
+	background-repeat: no-repeat;
+	background-color: #0786B0;
+	background-position: center; 
+	border-radius: 20px;
+	margin-bottom: 20px;
+	height: 350px;
+}
+
+.ssdiv {
+	text-align: justify;
+	text-justify: inter-word;
+	width: 100%;
+	margin: 0 auto;
+}

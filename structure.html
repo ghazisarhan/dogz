@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sgt. Stubby by ricardomaraschini</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/custom.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Sgt. Stubby</h1>
+        <p>Don't do the problems always get to you? Let's antecipate to that</p>
+
+        <p class="view"><a href="https://github.com/ricardomaraschini/sgt-stubby">View the Project on GitHub <small>ricardomaraschini/sgt-stubby</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/ricardomaraschini/sgt-stubby/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/ricardomaraschini/sgt-stubby/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/ricardomaraschini/sgt-stubby">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+	<div class="icondiv"></div>
+
+<h1>
+<a id="structure" class="anchor" href="#structure" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Structure</h1>
+
+<p>In order to avoid latency, <em>broker</em> works using <a href="http://learning-0mq-with-pyzmq.readthedocs.org/en/latest/pyzmq/patterns/pubsub.html">pub/sub zmq technology</a>, the messages are consumed by the middleware and then pushed to client app on the exact moment they happened, without further delay. </p>
+
+<p><img src="https://raw.githubusercontent.com/ricardomaraschini/sgt-stubby/master/art/structure.png"></p>
+
+<p>The broker(useful for Nagios and Naemon) is written in <em>C</em>, middleware in <em>Node.js</em> and the client is written using Apache Cordova framework.</p>
+
+<h1>
+<a id="installing" class="anchor" href="#installing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing</h1>
+
+<p>I need someone to document this further, unfortunately. I will try to make my best but I assume you have a good understanding of Nagios/Naemon, Docker Containers and Android SDK.</p>
+
+<p>After doing a checkout of this repository you gonna find two important directories:</p>
+
+<ul>
+<li>broker/</li>
+<li>js/</li>
+</ul>
+
+<p>Inside the js directory we have two another directories, one for the client app and another for the Middleware:</p>
+
+<ul>
+<li>js/client</li>
+<li>js/middleware</li>
+</ul>
+
+<p>In a nutshell what we have to do is:</p>
+
+<p>
+<ul>
+	<li>Compile and install broker into Nagios/Naemon</li>
+	<li>Enable Google Cloud Messaging for Push notifications</li>
+	<li>Adjust some source code to contain the api key and sender id of your Google Cloud Messaging</li>
+	<li>Run the Docker Container with the Middleware and make it connect to Nagios/Naemon broker providing the needed Google Cloud Messaging info</li>
+	<li>Prepare and install the .apk for Android(<em>again, my only phone is an Android</em>)</li>
+</ul>
+</p>
+
+<h2>
+<a id="broker" class="anchor" href="#broker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Broker</h2>
+
+<p>Enter the <em>broker</em> directory and type <em>make</em>(<em>make nagios</em> if you want to compile for Nagios), you gonna need <em>zmq-devel</em> and <em>jansson-devel</em> packages installed on your server, otherwise it will not compile. </p>
+
+<p>Once it is compiled you may copy it to your Nagios/Naemon host and add an entry on broker section of your main configuration file. That is straight forward and you may consult <a href="https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/configmain.html">https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/configmain.html</a> for further information about this configuration.</p>
+
+<p>After restarting your monitoring environment you may see an open port(6969). Please assure that the only host that has access to this port is the middleware host, all checks results are going to be available on this port. If you want to let it open, no problem, it is up to you. I don't implement any security measurements to lock who is connecting into the port, but in the future this is something I certainly have to do.</p>
+
+<h2>
+<a id="middleware" class="anchor" href="#middleware" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Middleware</h2>
+
+<p>For the middleware you gonna need a Docker container. Enter the js/middleware directory and type:</p>
+
+<p><code># docker build -t cockpit/middleware .</code> </p>
+
+<p>This may generate a Docker image named <em>cockpit/middleware</em>, put it to run on the following manner:</p>
+
+<p><code># docker run -e "server=tcp://192.168.10.4:6969" -p 49161:80 -d cockpit/middleware</code></p>
+
+<p><em>server</em> must point to Nagios/Naemon ip address and the port 49161 may be changed to another as it is the port where mobile devices are going to connect. Make sure that the port is available to connect. Once you put the container online you may see the port 49161 open to the world, you are almost there, now we just have to create the .apk and install it on phone.</p>
+
+<h2>
+<a id="client" class="anchor" href="#client" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Client</h2>
+
+<p>You need Android SDK and Cordova installed, enter on the directory called <em>js/client/</em> and type </p>
+
+<p><code># cordova platform add android</code>
+<code># cordova build</code></p>
+
+<p>This is going to generate an apk file that you may install on your phone.</p>
+		<p><a href="index.html">Back to the main page</a></p>
+
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/ricardomaraschini">ricardomaraschini</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
