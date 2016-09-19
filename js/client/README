@@ -1,0 +1,7 @@
+Building mobile app
+
+
+cordova platform add android
+cordova plugin add phonegap-plugin-push --variable SENDER_ID="SENDERID"
+cordova build (buils apk)
+cordova run android (installs on device through usb)
