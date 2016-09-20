@@ -89,7 +89,7 @@
 
 <p>This may generate a Docker image named <em>dogz/middleware</em>, put it to run on the following manner:</p>
 
-<p><code># docker run -e "server=tcp://192.168.10.4:6969" -p 49161:80 -d cockpit/middleware</code></p>
+<p><code># docker run -e "server=tcp://192.168.10.4:6969" -p 49161:80 -d dogz/middleware</code></p>
 
 <p><em>server</em> must point to Nagios/Naemon ip address and the port 49161 may be changed to another as it is the port where mobile devices are going to connect. Make sure that the port is available to connect. Once you put the container online you may see the port 49161 open to the world, you are almost there, now we just have to create the .apk and install it on phone.</p>
 
