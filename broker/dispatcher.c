@@ -24,11 +24,30 @@ static nebmodule	*mhandle;
 pid_t			 phppid;
 void			*context;
 void			*sender = NULL;
+int			 verbose = 0;
+extern int		 debug_level;
 
+
+void
+print_verbose(char *msg)
+{
+
+	if (verbose == 0)
+		return;
+
+#ifdef NAGIOS
+	write_to_all_logs(msg, NSLOG_INFO_MESSAGE);
+#else
+	nm_log(NSLOG_INFO_MESSAGE, msg)
+#endif
+
+}
 
 int
 start_connection()
 {
+
+	print_verbose("Creating new ZMQ context");
 	context = zmq_ctx_new();
 	if (context == NULL) {
 #ifdef NAGIOS
@@ -39,6 +58,8 @@ start_connection()
 		return ERROR;
 	}
 
+
+	print_verbose("Creating new ZMQ socket");
 	sender = zmq_socket(context, ZMQ_PUB);
 	if (sender == NULL) {
 #ifdef NAGIOS
@@ -49,6 +70,7 @@ start_connection()
 		return ERROR;
 	}
 
+	print_verbose("Binding ZMQ socket");
 	if (zmq_bind(sender, "tcp://*:6969") != 0) {
 #ifdef NAGIOS
 		write_to_all_logs(strerror(errno), NSLOG_INFO_MESSAGE);
@@ -58,9 +80,9 @@ start_connection()
 		return ERROR;
 	}
 
+	print_verbose("Dispatcher ready");
 	return OK;
 }
-
 
 int
 handle_check(int type, void *data)
@@ -82,17 +104,23 @@ handle_check(int type, void *data)
 			return OK;
 	}
 
+	print_verbose("Check handler start");
+
 	check = (nebstruct_service_check_data *)data;
-	if (check->type != NEBTYPE_SERVICECHECK_PROCESSED)
+	if (check->type != NEBTYPE_SERVICECHECK_PROCESSED) {
+		print_verbose("Not a NEBTYPE_SERVICECHECK_PROCESSED event");
 		return OK;
+	}
 
 
 	svc = find_service(
 	    check->host_name,
 	    check->service_description
 	);
-	if (svc == NULL)
+	if (svc == NULL) {
+		print_verbose("Unable to locate service");
 		return OK;
+	}
 
 	json = json_pack_ex(
 	    &error,
@@ -173,6 +201,8 @@ handle_check(int type, void *data)
 	}
 
 	zmq_msg_close(&out);
+	print_verbose("Check handler end, message sent.");
+
 	return OK;
 }
 
@@ -199,6 +229,10 @@ nebmodule_init(int flags, char *args, void *handle)
 	nm_log(NSLOG_INFO_MESSAGE, "websocket dispatcher started\n");
 #endif
 
+	if (debug_level & DEBUGL_EVENTBROKER) {
+		verbose = 1;
+	}
+
 	return OK;
 }
 
@@ -213,5 +247,6 @@ nebmodule_deinit(int flags, int reason)
 	    handle_check
 	);
 
+	print_verbose("Dispatcher stopped");
 	return OK;
 }
