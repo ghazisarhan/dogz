@@ -1,11 +1,11 @@
 {
-  "name": "network-cockpit",
+  "name": "dogz",
   "description": "App to view Nagios alerts on phone", 
   "version": "0.0.0",
   "license": "GPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ricardomaraschini/network-cockpit.git"
+    "url": "https://github.com/ricardomaraschini/dogz.git"
   },
   "devDependencies": {
     "mocha": "*",
