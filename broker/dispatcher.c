@@ -10,10 +10,10 @@
 #include <jansson.h>
 
 #ifdef NAGIOS
-#include "include/nagios351/nebcallbacks.h"
-#include "include/nagios351/nebstructs.h"
-#include "include/nagios351/nagios.h"
-#include "include/nagios351/broker.h"
+#include <nagios/nebcallbacks.h>
+#include <nagios/nebstructs.h>
+#include <nagios/nagios.h>
+#include <nagios/broker.h>
 #else
 #include "include/naemon/naemon.h"
 #endif
