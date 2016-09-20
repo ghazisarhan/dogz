@@ -5,3 +5,25 @@ cordova platform add android
 cordova plugin add phonegap-plugin-push --variable SENDER_ID="SENDERID"
 cordova build (buils apk)
 cordova run android (installs on device through usb)
+
+
+Installing development environment on Fedora 24
+
+NODE + CORDOVA
+
+# dnf install nodejs
+# dnf install npm
+# npm install -g cordova
+
+
+ANDROID SDK
+
+Download sdk from [1] and uncompress to /opt.
+Configure path
+Install java-devel
+
+
+
+
+
+[1] https://developer.android.com/studio/index.html
